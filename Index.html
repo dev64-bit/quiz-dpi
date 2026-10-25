@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Quiz Examination | Elite Edition</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* CSS Reset & Variables */
+        :root {
+            --bg-color: #050505;
+            --surface-color: #111111;
+            --text-main: #f5f5f5;
+            --text-muted: #888888;
+            --accent-color: #ccff00; /* Neon Lime */
+            --border-color: #222222;
+            --danger-color: #ff3366;
+            
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            
+            /* Anti-Copy */
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        /* Utility Classes */
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Layout */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 24px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Header / Brand */
+        .brand {
+            position: fixed;
+            top: 40px;
+            left: 40px;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1.2rem;
+            letter-spacing: -0.5px;
+            z-index: 100;
+            text-transform: uppercase;
+        }
+        .brand span { color: var(--accent-color); }
+
+        /* Typography */
+        h1, h2, h3 { font-family: var(--font-display); font-weight: 700; }
+        
+        .hero-title {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -2px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 4rem;
+            font-weight: 300;
+        }
+
+        /* Forms & Inputs */
+        .form-group {
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .form-group input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid var(--border-color);
+            color: var(--text-main);
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            font-family: var(--font-display);
+            padding: 10px 0;
+            transition: all 0.4s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-bottom-color: var(--accent-color);
+        }
+
+        .form-group input::placeholder {
+            color: #333;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        /* Buttons */
+        .btn {
+            background: var(--text-main);
+            color: var(--bg-color);
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            font-weight: 600;
+            padding: 1.2rem 3rem;
+            border: none;
+            border-radius: 0;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-accent {
+            background: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        .btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(204, 255, 0, 0.2);
+        }
+
+        .btn:disabled {
+            background: #333;
+            color: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Quiz UI */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            background: var(--bg-color);
+            z-index: 10;
+            padding-top: 2rem;
+        }
+
+        .timer-wrapper {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .timer-wrapper.danger { color: var(--danger-color); animation: pulse 1s infinite; }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .question-card { margin-bottom: 4rem; }
+
+        .question-text {
+            font-family: var(--font-display);
+            font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+            margin-bottom: 2.5rem;
+            line-height: 1.4;
+        }
+
+        /* Custom Radio Buttons as Cards */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .option-wrapper { position: relative; }
+
+        .option-wrapper input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        .option-label {
+            display: block;
+            padding: 2rem;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            line-height: 1.5;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            color: var(--text-muted);
+        }
+
+        .option-label:hover {
+            border-color: rgba(204, 255, 0, 0.5);
+            color: var(--text-main);
+            transform: scale(1.02);
+        }
+
+        .option-wrapper input[type="radio"]:checked ~ .option-label {
+            border-color: var(--accent-color);
+            background: rgba(204, 255, 0, 0.03);
+            color: var(--accent-color);
+            box-shadow: inset 0 0 0 1px var(--accent-color);
+        }
+
+        /* Result Screen */
+        .result-container {
+            padding-top: 6rem;
+            text-align: left;
+        }
+        
+        .score-display {
+            font-size: clamp(4rem, 12vw, 8rem);
+            font-family: var(--font-display);
+            font-weight: 700;
+            line-height: 1;
+            margin: 1rem 0 3rem 0;
+            color: var(--accent-color);
+        }
+
+        /* Dark Theme Review Cards */
+        .review-card {
+            background: var(--surface-color);
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #333;
+            border-top: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            text-align: left;
+        }
+        
+        .correct-box { border-left-color: var(--accent-color); }
+        .wrong-box { border-left-color: var(--danger-color); }
+        .unanswered-box { border-left-color: var(--text-muted); }
+        
+        .review-q { font-size: 1.2rem; color: var(--text-main); margin-bottom: 15px; font-family: var(--font-display); }
+        .review-ans { font-size: 1rem; margin-bottom: 8px; color: var(--text-muted); }
+        .text-accent { color: var(--accent-color); font-weight: 600; }
+        .text-danger { color: var(--danger-color); font-weight: 600; }
+
+        /* Custom Alert / Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--text-main);
+            color: var(--bg-color);
+            padding: 15px 30px;
+            font-family: var(--font-display);
+            font-weight: 600;
+            border-radius: 4px;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        .toast.error {
+            background: var(--danger-color);
+            color: #fff;
+            box-shadow: 0 10px 30px rgba(255, 51, 102, 0.3);
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .brand { position: relative; top: 0; left: 0; margin-bottom: 2rem; display: block; padding: 20px 24px 0; }
+            .container { padding-top: 1rem; justify-content: flex-start; }
+            .options-grid { grid-template-columns: 1fr; }
+            .top-bar { padding-top: 1rem; flex-direction: column; align-items: flex-start; gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="brand">C-Prog<span>.</span></div>
+
+    <!-- Custom Message Box (Replaces alert) -->
+    <div id="toast" class="toast">Error Message Here</div>
+
+    <!-- Registration Section -->
+    <div id="reg-section" class="container fade-in">
+        <h1 class="hero-title">Ready for the<br>Challenge.</h1>
+        <p class="subtitle">Operators and Expressions (Code: 28567)</p>
+        
+        <div class="form-group">
+            <span class="input-label">Student Name (English Only)</span>
+            <input type="text" id="studentName" placeholder="John Doe" autocomplete="off">
+        </div>
+
+        <div class="form-group">
+            <span class="input-label">Roll Number (English Digits)</span>
+            <input type="number" id="rollNo" placeholder="102938" autocomplete="off">
+        </div>
+
+        <div style="margin-top: 2rem;">
+            <button class="btn btn-accent" onclick="startQuiz()">Initialize Exam ➔</button>
+        </div>
+    </div>
+
+    <!-- Quiz Section -->
+    <div id="quiz-section" class="container hidden">
+        <div class="top-bar">
+            <div>
+                <div class="input-label" id="exam-meta">Programming in C / Quiz 03</div>
+            </div>
+            <div class="timer-wrapper" id="timer">
+                40:00
+            </div>
+        </div>
+
+        <div id="questions-container">
+            <!-- Questions will be injected here via JS -->
+        </div>
+
+        <div style="margin-top: 2rem; text-align: right; padding-bottom: 4rem;">
+            <button class="btn btn-accent" id="submitBtn" onclick="submitExam()">Submit Assessment</button>
+        </div>
+    </div>
+
+    <!-- Result Section -->
+    <div id="result-section" class="container hidden result-container">
+        <h2 class="subtitle" style="margin-bottom: 0;">Assessment Complete</h2>
+        <div class="score-display" id="final-score">0/40</div>
+        <p class="subtitle" style="color: var(--text-main); font-size: 1.2rem; max-width: 600px; margin-bottom: 3rem;">
+            আপনার রেজাল্ট সফলভাবে ট্রান্সমিট হয়েছে। নিচের প্যানেল থেকে আপনার উত্তরগুলো যাচাই করুন।
+        </p>
+        
+        <div id="review-container"></div>
+    </div>
+
+    <script>
+        // --- CONFIGURATION ---
+        const QUIZ_CONFIG = {
+            subjectName: "Programming in C",
+            subjectCode: "28567",
+            quizNumber: "Quiz 03",
+            examDate: "2026-10-26", 
+            timeLimitInMinutes: 30,
+            
+            rawQuestions: [
+                { q: "অপারেটর কী?", options: ["মেমরি লোকেশন", "বিশেষ চিহ্ন বা Symbol যা ডেটার ওপর কাজ করে", "ভেরিয়েবল", "ফাংশন"], ans: 1 },
+                { q: "যে অপারেটর শুধুমাত্র একটি অপারেন্ড নিয়ে কাজ করে তাকে কী বলে?", options: ["বাইনারি অপারেটর", "টারনারি অপারেটর", "ইউনারি অপারেটর", "স্পেশাল অপারেটর"], ans: 2 },
+                { q: "নিচের কোনটি অ্যারিথমেটিক অপারেটর নয়?", options: ["+", "-", "*", "&&"], ans: 3 },
+                { q: "C ভাষায় ভাগশেষ বের করার জন্য কোন অপারেটর ব্যবহার করা হয়?", options: ["/", "%", "\\", "MOD"], ans: 1 },
+                { q: "রিলেশনাল অপারেটর 'সমান' বোঝাতে কোনটি ব্যবহৃত হয়?", options: ["=", "==", "===", "!="], ans: 1 },
+                { q: "লজিক্যাল AND অপারেটরের চিহ্ন কোনটি?", options: ["&", "&&", "||", "!"], ans: 1 },
+                { q: "লজিক্যাল OR অপারেটরের চিহ্ন কোনটি?", options: ["|", "||", "&&", "!"], ans: 1 },
+                { q: "লজিক্যাল NOT অপারেটরের চিহ্ন কোনটি?", options: ["~", "!", "^", "!="], ans: 1 },
+                { q: "বিটওয়াইজ AND অপারেটরের চিহ্ন কোনটি?", options: ["&&", "&", "^", "<<"], ans: 1 },
+                { q: "অ্যাসাইনমেন্ট অপারেটর কোনটি?", options: ["==", "=", "++", "--"], ans: 1 },
+                { q: "কোন অপারেটরকে টারনারি অপারেটর (Ternary operator) বলা হয়?", options: ["++", "?:", "::", "->"], ans: 1 },
+                { q: "কমা (,) কোন ধরনের অপারেটর?", options: ["অ্যারিথমেটিক", "স্পেশাল", "লজিক্যাল", "রিলেশনাল"], ans: 1 },
+                { q: "17 % 3 এর মান কত?", options: ["5", "2", "0", "1"], ans: 1 },
+                { q: "int a = 10 এবং int b = 11 হলে, a/b এর মান কত?", options: ["0.90", "1", "0", "Error"], ans: 2 },
+                { q: "ইনক্রিমেন্ট অপারেটরের চিহ্ন কোনটি?", options: ["+", "++", "+=", "+1"], ans: 1 },
+                { q: "ডিক্রিমেন্ট অপারেটরের কাজ কী?", options: ["মান 2 কমানো", "মান 1 কমানো", "মান শূন্য করা", "মান ঋণাত্মক করা"], ans: 1 },
+                { q: "বাইনারি অপারেটর কয়টি অপারেন্ড নিয়ে কাজ করে?", options: ["১টি", "২টি", "৩টি", "অসংখ্য"], ans: 1 },
+                { q: "C প্রোগ্রামিংয়ে a = a + 3 স্টেটমেন্টের অর্থ কী?", options: ["a এর মান 3", "a এর পূর্বের মানের সাথে 3 যোগ", "a এবং 3 সমান", "কোনোটিই নয়"], ans: 1 },
+                { q: "রিলেশনাল এক্সপ্রেশনে শর্ত মিথ্যা (False) হলে C প্রোগ্রামে তার মান কত ধরা হয়?", options: ["-1", "0", "1", "Null"], ans: 1 },
+                { q: "নিচের কোনটি সাইজ অব (sizeof) অপারেটরের কাজ?", options: ["ভেরিয়েবলের মান বের করা", "ভেরিয়েবল বা অ্যারের মেমরির পরিমাণ বাইটে নির্ণয় করা", "ভেরিয়েবলের ডেটা টাইপ পরিবর্তন করা", "স্ট্রিংয়ের দৈর্ঘ্য মাপা"], ans: 1 },
+                { q: "Pre-increment এবং Post-increment এর মধ্যে মূল পার্থক্য কী?", options: ["Pre-এ আগে বৃদ্ধি পায় পরে বসে, Post-এ আগে বসে পরে বৃদ্ধি পায়", "Pre-এ আগে বসে পরে বৃদ্ধি পায়, Post-এ আগে বৃদ্ধি পায় পরে বসে", "দুটির কাজ একই", "Pre শুধু লুপে ব্যবহৃত হয়"], ans: 0 },
+                { q: "অ্যাসোসিয়েটিভিটি (Associativity) বলতে কী বোঝায়?", options: ["অপারেটরের কাজ করার ক্ষমতা", "অপারেটরগুলোর মধ্যে সম্পর্ক", "Precedence সমান হলে বাম থেকে ডানে নাকি ডান থেকে বামে কাজ হবে তার বৈশিষ্ট্য", "অপারেটরের ধরন"], ans: 2 },
+                { q: "x = a(b/c) / 2a² সমীকরণটির সঠিক C রূপান্তর কোনটি?", options: ["x = a*(b/c) / 2*a*a", "x = (a * (b/c)) / (2 * a * a)", "x = a(b/c) / (2a^2)", "x = a * b/c / 2 * a^2"], ans: 1 },
+                { q: "x = 10, y = 20, z = 30 হলে (x+y) > z && (y+z) > x এর মান কত?", options: ["1 (True)", "0 (False)", "10", "30"], ans: 1 },
+                { q: "নেস্টেড কন্ডিশনাল এক্সপ্রেশন (Nested Conditional Expression) কী?", options: ["একাধিক শর্তের যোগফল", "একটি Conditional expression এর মধ্যে আরেকটি Conditional expression রাখা", "লুপের ভেতরে কন্ডিশন", "if-else এর ব্যবহার"], ans: 1 },
+                { q: "a = 5, b = 6; c = (a > b) ? a : b; এখানে c এর মান কত হবে?", options: ["5", "6", "0", "1"], ans: 1 },
+                { q: "বিটওয়াইজ লেফট শিফট এবং রাইট শিফট অপারেটর যথাক্রমে কোনটি?", options: ["<< , >>", ">> , <<", "< , >", "<= , >="], ans: 0 },
+                { q: "শর্টহ্যান্ড অ্যাসাইনমেন্ট অপারেটরের একটি উদাহরণ হলো: y = y + x; এর শর্টহ্যান্ড রূপ কী?", options: ["y += x", "y =+ x", "y ++ x", "y == x"], ans: 0 },
+                { q: "(2x-y)^(m/n) রাশিটিকে C প্রোগ্রামিংয়ে কীভাবে প্রকাশ করা যায়?", options: ["(2*x-y)^(m/n)", "pow ((2*x-y), (m/n))", "pow (2x-y, m/n)", "power ((2*x-y), (m/n))"], ans: 1 },
+                { q: "a = 10; x = a++ হলে x এবং a এর মান কত হবে?", options: ["x=11, a=10", "x=10, a=11", "x=11, a=11", "x=10, a=10"], ans: 1 },
+                { q: "Indirection বা Pointer operator কোনটি?", options: ["&", "*", "->", "**"], ans: 1 },
+                { q: "ইনডেক্স বা পাওয়ার নির্ণয়ের জন্য C প্রোগ্রামে কোন ফাংশন ব্যবহার করা হয়?", options: ["exp()", "pow()", "power()", "sqrt()"], ans: 1 },
+                { q: "গাণিতিক অপারেটরের প্রিসিডেন্স (Precedence) অনুযায়ী নিচের কোনটির অগ্রাধিকার সবচেয়ে বেশি?", options: ["+ , -", "* , / , %", "( )", "="], ans: 2 },
+                { q: "নিচের কোডটির আউটপুট কী হবে?\nint a = 0;\na = a++ + a++ - a++ + ++a;\nprintf(\"%d\", a);", options: ["0", "1", "2", "3"], ans: 3 },
+                { q: "লজিক্যাল AND (&&) অপারেশনের ক্ষেত্রে a = 1 এবং b = 0 হলে a && b এর ফলাফল কত?", options: ["1", "0", "-1", "Error"], ans: 1 },
+                { q: "নিচের কোডটির আউটপুট কী হবে?\nint a = -1, b = 1;\na--;\nb++;\nprintf(\"a = %d, b = %d\", a, b);", options: ["a = 0, b = 2", "a = -2, b = 2", "a = -1, b = 1", "a = -2, b = 0"], ans: 1 },
+                { q: "5(x/y)^(k-1) / (t-3m)^(2/m) এর সঠিক C এক্সপ্রেশন কোনটি?", options: ["(pow(5*(x/y), (k-1))) / (pow(t-(3*m), (2/m)))", "(5*pow((x/y), (k-1))) / (pow(t-(3*m), (2/m)))", "pow(5*x/y, k-1) / pow(t-3*m, 2/m)", "5*pow(x/y, k-1) / (t-3m)^(2/m)"], ans: 0 },
+                { q: "কমা অপারেটর ব্যবহার করে সমতুল্য এক্সপ্রেশন 'for (j=10, i=1; i<=j; i++)' এ কমা অপারেটরের কাজ কী?", options: ["মেমরি কমানো", "বিভিন্ন এক্সপ্রেশনের মধ্যে সমন্বয় সাধন করা", "লুপ ব্রেক করা", "ভেরিয়েবল ডিক্লেয়ার করা"], ans: 1 },
+                { q: "float x = 10, y = 20, z = 5; k = y - x * z / 2; এখানে k এর মান কত হবে?", options: ["0", "-5", "15", "25"], ans: 1 },
+                { q: "লজিক্যাল OR (||) অপারেশনের ক্ষেত্রে ইনপুট a=0 এবং b=0 হলে আউটপুট কী হবে?", options: ["1", "0", "-1", "True"], ans: 1 }
+            ]
+        };
+
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzIESFNCVK3aCS3-u0OdzmPa20OcDqpdKjVJqPsA7BzkWSsyTxh1-2ogxka5cDiHEue0Q/exec';
+
+        // --- CORE LOGIC ---
+        let timeLimit = QUIZ_CONFIG.timeLimitInMinutes * 60;
+        let timerInterval;
+        let quizData = [];
+        let isSubmitted = false;
+        let tabSwitchCount = 0;
+
+        // Anti-Copy Restrictions
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && ['c', 'a', 'u', 'p', 'C', 'A', 'U', 'P'].includes(e.key)) e.preventDefault();
+            if (e.key === 'F12') e.preventDefault();
+        });
+
+        function showToast(message, isError = false, duration = 3000) {
+            const toast = document.getElementById('toast');
+            toast.innerText = message;
+            if(isError) {
+                toast.classList.add('error');
+            } else {
+                toast.classList.remove('error');
+            }
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, duration);
+        }
+
+        // Tab Switching Anti-Cheat
+        document.addEventListener("visibilitychange", function() {
+            const quizSection = document.getElementById('quiz-section');
+            if (quizSection && !quizSection.classList.contains('hidden') && !isSubmitted) {
+                if (document.hidden) {
+                    tabSwitchCount++;
+                    if (tabSwitchCount === 1) {
+                        showToast("Warning: Switching tabs is not allowed. One more time and exam submits automatically.", true, 5000);
+                    } else if (tabSwitchCount >= 2) {
+                        showToast("Exam terminated due to tab switching.", true, 5000);
+                        submitExam();
+                    }
+                }
+            }
+        });
+
+        function startQuiz() {
+            const nameInput = document.getElementById('studentName').value.trim();
+            const rollInput = document.getElementById('rollNo').value.trim();
+            const nameRegex = /^[a-zA-Z\s.]+$/;
+            const rollRegex = /^[0-9]+$/;
+
+            if (!nameInput || !nameRegex.test(nameInput)) {
+                showToast("Please enter a valid name (English only).", true);
+                return;
+            }
+            if (!rollInput || !rollRegex.test(rollInput)) {
+                showToast("Please enter a valid roll number.", true);
+                return;
+            }
+
+            // Transition UI
+            document.getElementById('reg-section').classList.add('hidden');
+            document.getElementById('reg-section').classList.remove('fade-in');
+            
+            const quizSection = document.getElementById('quiz-section');
+            quizSection.classList.remove('hidden');
+            quizSection.classList.add('fade-in');
+            
+            // Prepare Data
+            quizData = JSON.parse(JSON.stringify(QUIZ_CONFIG.rawQuestions));
+            renderQuestions();
+            
+            // Start Timer
+            updateTimer();
+            timerInterval = setInterval(updateTimer, 1000);
+            window.scrollTo(0,0);
+        }
+
+        function renderQuestions() {
+            const container = document.getElementById('questions-container');
+            container.innerHTML = '';
+            
+            // Shuffle Questions
+            quizData.sort(() => Math.random() - 0.5);
+
+            quizData.forEach((item, index) => {
+                const correctAnswerString = item.options[item.ans];
+                
+                // Shuffle Options
+                let shuffledOptions = [...item.options].sort(() => Math.random() - 0.5);
+                item.shuffledOptions = shuffledOptions;
+                item.newAnsIndex = shuffledOptions.indexOf(correctAnswerString);
+
+                // Format newlines for code blocks
+                let questionText = item.q;
+                if(questionText.includes('\n')) {
+                    questionText = questionText.replace(/\n/g, '<br>');
+                }
+
+                let html = `
+                <div class="question-card">
+                    <div class="question-text">
+                        <span style="color: var(--accent-color); margin-right: 15px;">${(index + 1).toString().padStart(2, '0')}</span> 
+                        ${questionText}
+                    </div>
+                    <div class="options-grid">
+                `;
+                
+                shuffledOptions.forEach((opt, i) => {
+                    const inputId = `q${index}_opt${i}`;
+                    html += `
+                        <div class="option-wrapper">
+                            <input type="radio" name="q${index}" id="${inputId}" value="${i}">
+                            <label class="option-label" for="${inputId}">${opt}</label>
+                        </div>
+                    `;
+                });
+                
+                html += `</div></div>`;
+                container.innerHTML += html;
+            });
+        }
+
+        function updateTimer() {
+            let m = Math.floor(timeLimit / 60);
+            let s = timeLimit % 60;
+            
+            const timerEl = document.getElementById('timer');
+            timerEl.innerText = `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+            
+            // Warning color at 5 minutes
+            if (timeLimit <= 300) {
+                timerEl.classList.add('danger');
+            }
+            
+            if (timeLimit <= 0) {
+                clearInterval(timerInterval);
+                submitExam();
+            }
+            timeLimit--;
+        }
+
+        function submitExam() {
+            if (isSubmitted) return;
+            isSubmitted = true;
+            clearInterval(timerInterval);
+
+            const btn = document.getElementById('submitBtn');
+            btn.innerText = 'Processing Transmission...';
+            btn.disabled = true;
+
+            let score = 0;
+            let reviewHTML = '<h3 style="margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">Answer Breakdown</h3>';
+
+            quizData.forEach((item, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                const userSelectedIndex = selected ? parseInt(selected.value) : -1;
+                const correctIndex = item.newAnsIndex;
+                
+                let isCorrect = userSelectedIndex === correctIndex;
+                if (isCorrect) score++;
+
+                let userText = userSelectedIndex !== -1 ? item.shuffledOptions[userSelectedIndex] : 'No Answer Provided';
+                let correctText = item.shuffledOptions[correctIndex];
+                
+                let boxClass = isCorrect ? 'correct-box' : 'wrong-box';
+                if (userSelectedIndex === -1) boxClass = 'unanswered-box';
+
+                let questionText = item.q;
+                if(questionText.includes('\n')) {
+                    questionText = questionText.replace(/\n/g, '<br>');
+                }
+
+                reviewHTML += `
+                <div class="review-card ${boxClass}">
+                    <p class="review-q"><span style="color: var(--text-muted); margin-right: 10px;">${(index + 1).toString().padStart(2, '0')}</span> ${questionText}</p>
+                    <p class="review-ans">Selected: <span class="${isCorrect ? 'text-accent' : (userSelectedIndex === -1 ? '' : 'text-danger')}">${userText}</span></p>
+                    ${!isCorrect ? `<p class="review-ans">Correct: <span class="text-accent">${correctText}</span></p>` : ''}
+                </div>`;
+            });
+
+            document.getElementById('review-container').innerHTML = reviewHTML;
+
+            const name = document.getElementById('studentName').value.trim();
+            const roll = document.getElementById('rollNo').value.trim();
+
+            const finalURL = `${scriptURL}?name=${encodeURIComponent(name)}&roll=${encodeURIComponent(roll)}&score=${score}&subject=${encodeURIComponent(QUIZ_CONFIG.subjectName)}&subjectCode=${encodeURIComponent(QUIZ_CONFIG.subjectCode)}&quizNumber=${encodeURIComponent(QUIZ_CONFIG.quizNumber)}&date=${encodeURIComponent(QUIZ_CONFIG.examDate)}`;
+            
+            fetch(finalURL, { method: 'GET', mode: 'no-cors' })
+            .then(() => {
+                document.getElementById('quiz-section').classList.add('hidden');
+                
+                const resultSection = document.getElementById('result-section');
+                resultSection.classList.remove('hidden');
+                resultSection.classList.add('fade-in');
+                
+                document.getElementById('final-score').innerText = `${score}/${quizData.length}`;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                showToast("Transmission Successful");
+            })
+            .catch(error => {
+                showToast("Transmission Failed. Check connection.", true, 5000);
+                btn.disabled = false;
+                btn.innerText = 'Retry Transmission';
+                isSubmitted = false;
+            });
+        }
+    </script>
+</body>
+</html>
