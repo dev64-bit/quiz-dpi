@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Quiz Examination | Elite Edition</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* CSS Reset & Variables */
+        :root {
+            --bg-color: #050505;
+            --surface-color: #111111;
+            --text-main: #f5f5f5;
+            --text-muted: #888888;
+            --accent-color: #ccff00;
+            --border-color: #222222;
+            --danger-color: #ff3366;
+            
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 24px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .brand {
+            position: fixed;
+            top: 40px;
+            left: 40px;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1.2rem;
+            letter-spacing: -0.5px;
+            z-index: 100;
+            text-transform: uppercase;
+        }
+
+        .brand span { color: var(--accent-color); }
+
+        h1, h2, h3 {
+            font-family: var(--font-display);
+            font-weight: 700;
+        }
+        
+        .hero-title {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -2px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 4rem;
+            font-weight: 300;
+        }
+
+        .form-group {
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .form-group input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid var(--border-color);
+            color: var(--text-main);
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            font-family: var(--font-display);
+            padding: 10px 0;
+            transition: all 0.4s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-bottom-color: var(--accent-color);
+        }
+
+        .form-group input::placeholder {
+            color: #333;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            background: var(--text-main);
+            color: var(--bg-color);
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            font-weight: 600;
+            padding: 1.2rem 3rem;
+            border: none;
+            border-radius: 0;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-accent {
+            background: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        .btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(204, 255, 0, 0.2);
+        }
+
+        .btn:disabled {
+            background: #333;
+            color: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            background: var(--bg-color);
+            z-index: 10;
+            padding-top: 2rem;
+        }
+
+        .timer-wrapper {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .timer-wrapper.danger {
+            color: var(--danger-color);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .question-card {
+            margin-bottom: 4rem;
+        }
+
+        .question-text {
+            font-family: var(--font-display);
+            font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+            margin-bottom: 2.5rem;
+            line-height: 1.4;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .option-wrapper {
+            position: relative;
+        }
+
+        .option-wrapper input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        .option-label {
+            display: block;
+            padding: 2rem;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            line-height: 1.5;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            color: var(--text-muted);
+        }
+
+        .option-label:hover {
+            border-color: rgba(204, 255, 0, 0.5);
+            color: var(--text-main);
+            transform: scale(1.02);
+        }
+
+        .option-wrapper input[type="radio"]:checked ~ .option-label {
+            border-color: var(--accent-color);
+            background: rgba(204, 255, 0, 0.03);
+            color: var(--accent-color);
+            box-shadow: inset 0 0 0 1px var(--accent-color);
+        }
+
+        .result-container {
+            padding-top: 6rem;
+            text-align: left;
+        }
+        
+        .score-display {
+            font-size: clamp(4rem, 12vw, 8rem);
+            font-family: var(--font-display);
+            font-weight: 700;
+            line-height: 1;
+            margin: 1rem 0 3rem 0;
+            color: var(--accent-color);
+        }
+
+        .review-card {
+            background: var(--surface-color);
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #333;
+            border-top: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            text-align: left;
+        }
+        
+        .correct-box { border-left-color: var(--accent-color); }
+        .wrong-box { border-left-color: var(--danger-color); }
+        .unanswered-box { border-left-color: var(--text-muted); }
+        
+        .review-q {
+            font-size: 1.2rem;
+            color: var(--text-main);
+            margin-bottom: 15px;
+            font-family: var(--font-display);
+        }
+
+        .review-ans {
+            font-size: 1rem;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+        }
+
+        .text-accent {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .text-danger {
+            color: var(--danger-color);
+            font-weight: 600;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--text-main);
+            color: var(--bg-color);
+            padding: 15px 30px;
+            font-family: var(--font-display);
+            font-weight: 600;
+            border-radius: 4px;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .toast.error {
+            background: var(--danger-color);
+            color: #fff;
+            box-shadow: 0 10px 30px rgba(255, 51, 102, 0.3);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .brand {
+                position: relative;
+                top: 0;
+                left: 0;
+                margin-bottom: 2rem;
+                display: block;
+                padding: 20px 24px 0;
+            }
+
+            .container {
+                padding-top: 1rem;
+                justify-content: flex-start;
+            }
+
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .top-bar {
+                padding-top: 1rem;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="brand">C-Prog<span>.</span></div>
+
+    <div id="toast" class="toast">Error Message Here</div>
+
+    <!-- Registration Section -->
+    <div id="reg-section" class="container fade-in">
+        <h1 class="hero-title">Ready for the<br>Challenge.</h1>
+
+        <p class="subtitle">
+            Application Development Using Python (Code: 28531)
+        </p>
+        
+        <div class="form-group">
+            <span class="input-label">Student Name (English Only)</span>
+            <input type="text" id="studentName" placeholder="John Doe" autocomplete="off">
+        </div>
+
+        <div class="form-group">
+            <span class="input-label">Roll Number (English Digits)</span>
+            <input type="number" id="rollNo" placeholder="102938" autocomplete="off">
+        </div>
+
+        <div style="margin-top: 2rem;">
+            <button class="btn btn-accent" onclick="startQuiz()">
+                Initialize Exam ➔
+            </button>
+        </div>
+    </div>
+
+    <!-- Quiz Section -->
+    <div id="quiz-section" class="container hidden">
+
+        <div class="top-bar">
+            <div>
+                <div class="input-label" id="exam-meta">
+                    Application Development Using Python / Quiz 05
+                </div>
+            </div>
+
+            <div class="timer-wrapper" id="timer">
+                20:00
+            </div>
+        </div>
+
+        <div id="questions-container">
+            <!-- Questions will be injected here via JS -->
+        </div>
+
+        <div style="margin-top: 2rem; text-align: right; padding-bottom: 4rem;">
+            <button class="btn btn-accent" id="submitBtn" onclick="submitExam()">
+                Submit Assessment
+            </button>
+        </div>
+    </div>
+
+    <!-- Result Section -->
+    <div id="result-section" class="container hidden result-container">
+
+        <h2 class="subtitle" style="margin-bottom: 0;">
+            Assessment Complete
+        </h2>
+
+        <div class="score-display" id="final-score">
+            0/40
+        </div>
+
+        <p class="subtitle" style="color: var(--text-main); font-size: 1.2rem; max-width: 600px; margin-bottom: 3rem;">
+            আপনার রেজাল্ট সফলভাবে ট্রান্সমিট হয়েছে। নিচের প্যানেল থেকে আপনার উত্তরগুলো যাচাই করুন।
+        </p>
+        
+        <div id="review-container"></div>
+    </div>
+
+    <script>
+
+        // --- CONFIGURATION ---
+        const QUIZ_CONFIG = {
+
+            subjectName: "Application Development Using Python",
+
+            subjectCode: "28531",
+
+            quizNumber: "Quiz 05",
+
+            examDate: "29-October-2026",
+
+            timeLimitInMinutes: 20,
+
+            marks: 40,
+
+            rawQuestions: [
+
+                {
+                    q: "ইনহেরিট্যান্স (Inheritance) বলতে কী বোঝায়?",
+                    options: [
+                        "একই নামের ফাংশনের ভিন্ন রূপ",
+                        "ডেটা লুকিয়ে রাখার প্রক্রিয়া",
+                        "চাইল্ড ক্লাস তৈরির সময় পেরেন্ট ক্লাসের বিহেভিয়ার ও প্রোপার্টিজ ধারণ করার মেকানিজম",
+                        "অভ্যন্তরীণ কাজ লুকিয়ে রাখা"
+                    ],
+                    ans: 2
+                },
+
+                {
+                    q: "'পলিমরফিজম' (Polymorphism) শব্দটির অর্থ কী?",
+                    options: [
+                        "বহু এবং রূপ",
+                        "একক বৈশিষ্ট্য",
+                        "ডেটা হাইডিং",
+                        "উত্তরাধিকার"
+                    ],
+                    ans: 0
+                },
+
+                {
+                    q: "পাইথন (Python) কোন ধরনের প্রোগ্রামিং ল্যাঙ্গুয়েজ?",
+                    options: [
+                        "প্রসিডিউরাল ল্যাঙ্গুয়েজ",
+                        "অবজেক্ট ওরিয়েন্টেড প্রোগ্রামিং (OOP) ল্যাঙ্গুয়েজ",
+                        "মার্কআপ ল্যাঙ্গুয়েজ",
+                        "অ্যাসেম্বলি ল্যাঙ্গুয়েজ"
+                    ],
+                    ans: 1
+                },
+
+                {
+                    q: "'অবজেক্ট' (Object) কী?",
+                    options: [
+                        "একটি ডেটা টাইপ",
+                        "একটি লজিক্যাল এনটিটি, যার বিভিন্ন অ্যাট্রিবিউটস এবং বিহেভিয়ার রয়েছে",
+                        "একটি ফাংশন",
+                        "একটি অপারেটর"
+                    ],
+                    ans: 1
+                },
+
+                {
+                    q: "অবজেক্টকে প্রোগ্রামে যে মেকানিজমের মাধ্যমে ডিফাইন করা হয়, তাকে কী বলে?",
+                    options: [
+                        "ভেরিয়েবল",
+                        "ফাংশন",
+                        "ক্লাস",
+                        "পলিমরফিজম"
+                    ],
+                    ans: 2
+                },
+
+                {
+                    q: "অবজেক্ট ওরিয়েন্টেড প্রোগ্রামিং-এর গুরুত্বপূর্ণ বৈশিষ্ট্য কোনটি নয়?",
+                    options: [
+                        "পলিমরফিজম",
+                        "ইনহেরিট্যান্স",
+                        "এনক্যাপসুলেশন",
+                        "পয়েন্টার"
+                    ],
+                    ans: 3
+                },
+
+                {
+                    q: "OOP-এর পিলার বলতে কী বোঝায়?",
+                    options: [
+                        "ক্লাসের ডেটা টাইপ",
+                        "পলিমরফিজম, ইনহেরিট্যান্স, এনক্যাপসুলেশন ও অ্যাবস্ট্রাকশন বৈশিষ্ট্যগুলো",
+                        "ফাংশন ওভারলোডিং",
+                        "শুধুমাত্র অবজেক্ট তৈরি করা"
+                    ],
+                    ans: 1
+                },
+
+                {
+                    q: "4-Pillars-এর গুরুত্ব কী?",
+                    options: [
+                        "এর মাধ্যমে প্রোগ্রাম ডিলিট করা যায়",
+                        "এর সাহায্যে সংক্ষেপে বাস্তবসম্মত শক্তিশালী অ্যাপ্লিকেশন তৈরি করা যায়",
+                        "মেমরি কমানো যায়",
+                        "কোডের আকার বড় করা যায়"
+                    ],
+                    ans: 1
+                },
+
+                {
+                    q: "এনক্যাপসুলেশন (Encapsulation)-এর অপর নাম কী?",
+                    options: [
+                        "ডাটা হাইডিং বা ডাটা প্রটেকশন",
+                        "ডাটা শেয়ারিং",
+                        "মেথড ওভাররাইডিং",
+                        "ডাটা ওভারলোডিং"
+                    ],
+                    ans: 0
+                },
+
+                {
+                    q: "যে প্রক্রিয়ায় ডাটা ও মেথডসমূহকে একত্রিত করে ক্লাস তৈরি করা হয় তাকে কী বলে?",
+                    options: [
+                        "অ্যাবস্ট্রাকশন",
+                        "ইনহেরিট্যান্স",
+                        "এনক্যাপসুলেশন",
+                        "পলিমরফিজম"
+                    ],
+                    ans: 2
+                },
+
+                {
+                    q: "অ্যাবস্ট্রাকশন (Abstraction) হলো এমন একটি প্রক্রিয়া যেখানে—",
+                    options: [
+                        "সব কোড ব্যবহারকারীকে দেখানো হয়",
+                        "জটিল অভ্যন্তরীণ কাজগুলো লুকিয়ে রেখে ব্যবহারকারীর সামনে শুধু প্রয়োজনীয় অংশ দেখানো হয়",
+                        "একাধিক ক্লাসকে একীভূত করা হয়",
+                        "ডেটাবেস তৈরি করা হয়"
+                    ],
+                    ans: 1
+                },
+
+                {
+                    q: "Abstract class-এ এমন মেথড থাকতে পারে যেগুলোর কী নেই?",
+                    options: [
+                        "নাম নেই",
+                        "প্যারামিটার নেই",
+                        "কোনো বাস্তবায়ন (Implementation) নেই",
+                        "কোনো সাবক্লাস নেই"
+                    ],
+                    ans: 2
+                },
+
+                {
+                    q: "সুপার ক্লাস (Super Class) বা পেরেন্ট ক্লাস কাকে বলে?",
+                    options: [
+                        "যে ক্লাস অন্য ক্লাসকে ইনহেরিট করে",
+                        "যে ক্লাসকে অন্য ক্লাস ইনহেরিট করে",
+                        "যার কোনো মেথড নেই",
+                        "যেটি নিজে নিজে রান করতে পারে না"
+                    ],
+                    ans: 1
+                },
+
+                {
+                    q: "অবজেক্ট ওরিয়েন্টেড প্রোগ্রামিং-এ যখন একটি ক্লাসের বৈশিষ্ট্যগুলোকে ইনহেরিট করে নতুন একটি ক্লাস তৈরি করা হয়, সেই নতুন ক্লাসটিকে কী বলে?",
+                    options: [
+                        "সুপার ক্লাস",
+                        "বেস ক্লাস",
+                        "সাব ক্লাস (ডিরাইভড ক্লাস)",
+                        "অ্যাবস্ট্রাক্ট ক্লাস"
+                    ],
+                    ans: 2
+                },
+
+                {
+                    q: "একটি পেরেন্ট ক্লাসের কমন বৈশিষ্ট্যসমূহ অন্য ক্লাসে ইনহেরিট করে কাজ করাকে কোন ধরনের ইনহেরিট্যান্স বলে?",
+                    options: [
+                        "সিঙ্গেল ইনহেরিট্যান্স",
+                        "মাল্টিলেভেল ইনহেরিট্যান্স",
+                        "মাল্টিপল ইনহেরিট্যান্স",
+                        "হাইব্রিড ইনহেরিট্যান্স"
+                    ],
+                    ans: 0
+                },
+
+                {
+                    q: "যদি একটি ডিরাইভড ক্লাসেরও আরও ডিরাইভড ক্লাস থাকে, তখন তাকে কী বলে?",
+                    options: [
+                        "সিঙ্গেল ইনহেরিট্যান্স",
+                        "মাল্টিলেভেল ইনহেরিট্যান্স",
+                        "হাইব্রিড ইনহেরিট্যান্স",
+                        "হায়ারার্কিক্যাল ইনহেরিট্যান্স"
+                    ],
+                    ans: 1
+                },
+
+                {
+                    q: "যে পদ্ধতিতে দুই বা ততোধিক ইনহেরিট্যান্স পদ্ধতি ব্যবহার করা হয়, তাকে কী বলে?",
+                    options: [
+                        "হাইব্রিড ইনহেরিট্যান্স",
+                        "মাল্টিপল ইনহেরিট্যান্স",
+                        "সিঙ্গেল ইনহেরিট্যান্স",
+                        "মাল্টিলেভেল ইনহেরিট্যান্স"
+                    ],
+                    ans: 0
+                },
+
+                {
+                    q: "একটি ক্লাস একই সাথে একাধিক ক্লাসকে ইনহেরিট করতে পারলে তাকে কী বলে?",
+                    options: [
+                        "মাল্টিলেভেল ইনহেরিট্যান্স",
+                        "মাল্টিপল ইনহেরিট্যান্স",
+                        "হায়ারার্কিক্যাল ইনহেরিট্যান্স",
+                        "সিঙ্গেল ইনহেরিট্যান্স"
+                    ],
+                    ans: 1
+                },
+
+                {
+                    q: "একটি পেরেন্ট ক্লাস-এর একাধিক চাইল্ড ক্লাস বিদ্যমান থাকলে তাকে কী বলে?",
+                    options: [
+                        "মাল্টিপল ইনহেরিট্যান্স",
+                        "হাইব্রিড ইনহেরিট্যান্স",
+                        "হায়ারার্কিক্যাল ইনহেরিট্যান্স",
+                        "মাল্টিলেভেল ইনহেরিট্যান্স"
+                    ],
+                    ans: 2
+                },
+
+                {
+                    q: "বেস ক্লাসের মধ্যে কোনো মেথড ডিফাইন করে ডিরাইভড ক্লাসে কাজ করা হলে বেস ক্লাসের মেথডসমূহকে কী বলে?",
+                    options: [
+                        "ওভাররাইডিং মেথড",
+                        "ওভাররিডেন মেথড",
+                        "অ্যাবস্ট্রাক্ট মেথড",
+                        "প্রাইভেট মেথড"
+                    ],
+                    ans: 1
+                },
+
+                {
+                    q: "বেস ক্লাসের মধ্যে কোনো মেথড ডিফাইন করে ডিরাইভড ক্লাসে কাজ করা হলে ডিরাইভড ক্লাসের মেথডসমূহকে কী বলে?",
+                    options: [
+                        "ওভাররাইডিং মেথড",
+                        "ওভাররিডেন মেথড",
+                        "স্ট্যাটিক মেথড",
+                        "হাইড মেথড"
+                    ],
+                    ans: 0
+                },
+
+                {
+                    q: "\"Vehicle বলতে আমরা তো দুনিয়ার সব চলমান যানবাহনকেই বুঝিয়েছি, কিন্তু ভিন্ন ভিন্ন যানবাহনের ভিন্ন ভিন্ন রূপ থাকে\" - এটি কোন বৈশিষ্ট্যের উদাহরণ?",
+                    options: [
+                        "ইনহেরিট্যান্স",
+                        "এনক্যাপসুলেশন",
+                        "পলিমরফিজম",
+                        "অ্যাবস্ট্রাকশন"
+                    ],
+                    ans: 2
+                },
+
+                {
+                    q: "ইনহেরিট্যান্স (Inheritance) শব্দের সাধারণ অর্থ কী?",
+                    options: [
+                        "লুকিয়ে রাখা",
+                        "উত্তরাধিকারসূত্রে পাওয়া",
+                        "ভিন্ন রূপ ধারণ করা",
+                        "একত্র করা"
+                    ],
+                    ans: 1
+                },
+
+                {
+                    q: "অবজেক্টে ডাটাগুলো বিভিন্নভাবে মোড়ানো থাকার কারণে কী হয়?",
+                    options: [
+                        "ডাটা ডিলিট হয়ে যায়",
+                        "ডাটা সুরক্ষিত থাকে",
+                        "মেমরি বেশি প্রয়োজন হয়",
+                        "প্রোগ্রামের গতি কমে যায়"
+                    ],
+                    ans: 1
+                },
+
+                {
+                    q: "\"একটি জিনিস কীভাবে কাজ করে, তা না দেখিয়ে শুধু কী কাজ করে সেটাই দেখানো\" - এটি কোন বৈশিষ্ট্যের কাজ?",
+                    options: [
+                        "এনক্যাপসুলেশন",
+                        "পলিমরফিজম",
+                        "ইনহেরিট্যান্স",
+                        "অ্যাবস্ট্রাকশন"
+                    ],
+                    ans: 3
+                },
+
+                {
+                    q: "গাড়ি চালাতে হলে আমরা শুধু start(), stop() এর মতো ফাংশন ব্যবহার করি, কিন্তু ইঞ্জিনের ভেতরের কাজগুলো জানার প্রয়োজন হয় না- এটি কোন পিলারের উদাহরণ?",
+                    options: [
+                        "ইনহেরিট্যান্স",
+                        "অ্যাবস্ট্রাকশন",
+                        "পলিমরফিজম",
+                        "এনক্যাপসুলেশন"
+                    ],
+                    ans: 1
+                },
+
+                {
+                    q: "পাইথনে Abstract class তৈরি করার জন্য কোন মডিউলটি ইমপোর্ট করতে হয়?",
+                    options: [
+                        "math",
+                        "os",
+                        "abc",
+                        "sys"
+                    ],
+                    ans: 2
+                },
+
+                {
+                    q: "OOP-এর ৪টি পিলারকে মনে রাখার সুবিধার্থে সংক্ষেপে কী বলা হয়?",
+                    options: [
+                        "PIEA",
+                        "POOP",
+                        "APIE",
+                        "PAIE"
+                    ],
+                    ans: 0
+                },
+
+                {
+                    q: "PIEA-এর পূর্ণরূপের মধ্যে 'E' দ্বারা কী বোঝানো হয়েছে?",
+                    options: [
+                        "Exception",
+                        "Encapsulation",
+                        "Execution",
+                        "Error"
+                    ],
+                    ans: 1
+                },
+
+                {
+                    q: "'Animal হচ্ছে পেরেন্ট ক্লাস, Dog হচ্ছে চাইল্ড ক্লাস' - এটি কীসের উদাহরণ?",
+                    options: [
+                        "পলিমরফিজম",
+                        "অ্যাবস্ট্রাকশন",
+                        "এনক্যাপসুলেশন",
+                        "ইনহেরিট্যান্স"
+                    ],
+                    ans: 3
+                },
+
+                {
+                    q: "প্রোগ্রামে Animal এবং Turtle দুইটি ক্লাসের মধ্যেই run() নামক মেথড ডিফাইন করা হয়েছে যা কলের উপর নির্ভর করে ফলাফল দেয়। এটি কীসের উদাহরণ?",
+                    options: [
+                        "পলিমরফিজম",
+                        "এনক্যাপসুলেশন",
+                        "ডাটা হাইডিং",
+                        "অ্যাবস্ট্রাকশন"
+                    ],
+                    ans: 0
+                },
+
+                {
+                    q: "পাইথনে `tim = Turtle(\"tim\")` কোডটি দিয়ে মূলত কী করা হয়েছে?",
+                    options: [
+                        "একটি মেথড ডিক্লেয়ার করা হয়েছে",
+                        "Turtle ক্লাসের একটি অবজেক্ট তৈরি করা হয়েছে",
+                        "একটি নতুন ক্লাস তৈরি করা হয়েছে",
+                        "প্রোগ্রাম রান করা হয়েছে"
+                    ],
+                    ans: 1
+                },
+
+                {
+                    q: "যে প্রক্রিয়ায় ডাটা ও মেথডসমূহকে একত্রিত করে ক্লাস তৈরি করা যায় এবং ডাটা ও মেথডসমূহকে বাহিরের অবাঞ্ছিত অ্যাক্সেস হতে রক্ষা করা যায়, তাকে কী বলে?",
+                    options: [
+                        "অ্যাবস্ট্রাকশন",
+                        "ইনহেরিট্যান্স",
+                        "এনক্যাপসুলেশন",
+                        "পলিমরফিজম"
+                    ],
+                    ans: 2
+                },
+
+                {
+                    q: "এনক্যাপসুলেশনের মাধ্যমে ক্লাসকে কী থেকে রক্ষা করা হয়?",
+                    options: [
+                        "মেমরি লিক থেকে",
+                        "বাহিরের অবাঞ্ছিত অ্যাক্সেস হতে",
+                        "ভাইরাসের আক্রমণ থেকে",
+                        "সিনট্যাক্স এরর থেকে"
+                    ],
+                    ans: 1
+                },
+
+                {
+                    q: "`class Fish:` এর ভেতর `self.__size` ভেরিয়েবলটি কী নির্দেশ করছে?",
+                    options: [
+                        "গ্লোবাল ভেরিয়েবল",
+                        "এনক্যাপসুলেটেড বা প্রাইভেট ডাটা",
+                        "পাবলিক মেথড",
+                        "প্যারেন্ট ক্লাস"
+                    ],
+                    ans: 1
+                },
+
+                {
+                    q: "পাইথনে সিঙ্গেল ইনহেরিট্যান্স বোঝানোর জন্য `class B(A):` লিখলে 'A' কী নির্দেশ করে?",
+                    options: [
+                        "চাইল্ড ক্লাস",
+                        "সাব ক্লাস",
+                        "পেরেন্ট বা বেস ক্লাস",
+                        "অবজেক্ট"
+                    ],
+                    ans: 2
+                },
+
+                {
+                    q: "`class A:` এর পর `class B(A):` এবং সবশেষে `class C(B):` তৈরি করা হলে এটি কোন ধরনের ইনহেরিট্যান্স?",
+                    options: [
+                        "সিঙ্গেল ইনহেরিট্যান্স",
+                        "মাল্টিলেভেল ইনহেরিট্যান্স",
+                        "মাল্টিপল ইনহেরিট্যান্স",
+                        "হাইব্রিড ইনহেরিট্যান্স"
+                    ],
+                    ans: 1
+                },
+
+                {
+                    q: "`class <child_class>(<parent_class_one>, <parent_class_two>):` - এটি কোন ইনহেরিট্যান্সের সিনট্যাক্স?",
+                    options: [
+                        "মাল্টিপল ইনহেরিট্যান্স",
+                        "মাল্টিলেভেল ইনহেরিট্যান্স",
+                        "হায়ারার্কিক্যাল ইনহেরিট্যান্স",
+                        "সিঙ্গেল ইনহেরিট্যান্স"
+                    ],
+                    ans: 0
+                },
+
+                {
+                    q: "একটি পেরেন্ট ক্লাসের বৈশিষ্ট্যগুলো একাধিক চাইল্ড ক্লাসে ইনহেরিট করা হলে তাকে কী ইনহেরিট্যান্স বলে?",
+                    options: [
+                        "মাল্টিপল ইনহেরিট্যান্স",
+                        "হায়ারার্কিক্যাল ইনহেরিট্যান্স",
+                        "হাইব্রিড ইনহেরিট্যান্স",
+                        "সিঙ্গেল ইনহেরিট্যান্স"
+                    ],
+                    ans: 1
+                },
+
+                {
+                    q: "যে পদ্ধতিতে দুই বা ততোধিক ইনহেরিট্যান্স পদ্ধতি একসাথে ব্যবহার করা হয়, তাকে কী বলে?",
+                    options: [
+                        "সিঙ্গেল ইনহেরিট্যান্স",
+                        "মাল্টিলেভেল ইনহেরিট্যান্স",
+                        "মাল্টিপল ইনহেরিট্যান্স",
+                        "হাইব্রিড ইনহেরিট্যান্স"
+                    ],
+                    ans: 3
+                }
+
+            ]
+        };
+
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzIESFNCVK3aCS3-u0OdzmPa20OcDqpdKjVJqPsA7BzkWSsyTxh1-2ogxka5cDiHEue0Q/exec';
+
+        // --- CORE LOGIC ---
+        let timeLimit = QUIZ_CONFIG.timeLimitInMinutes * 60;
+        let timerInterval;
+        let quizData = [];
+        let isSubmitted = false;
+        let tabSwitchCount = 0;
+
+        // Anti-Copy Restrictions
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        document.addEventListener('keydown', function(e) {
+            if (
+                e.ctrlKey &&
+                ['c', 'a', 'u', 'p', 'C', 'A', 'U', 'P'].includes(e.key)
+            ) {
+                e.preventDefault();
+            }
+
+            if (e.key === 'F12') {
+                e.preventDefault();
+            }
+        });
+
+        function showToast(message, isError = false, duration = 3000) {
+            const toast = document.getElementById('toast');
+
+            toast.innerText = message;
+
+            if (isError) {
+                toast.classList.add('error');
+            } else {
+                toast.classList.remove('error');
+            }
+
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, duration);
+        }
+
+        // Tab Switching Anti-Cheat
+        document.addEventListener("visibilitychange", function() {
+
+            const quizSection = document.getElementById('quiz-section');
+
+            if (
+                quizSection &&
+                !quizSection.classList.contains('hidden') &&
+                !isSubmitted
+            ) {
+
+                if (document.hidden) {
+
+                    tabSwitchCount++;
+
+                    if (tabSwitchCount === 1) {
+
+                        showToast(
+                            "Warning: Switching tabs is not allowed. One more time and exam submits automatically.",
+                            true,
+                            5000
+                        );
+
+                    } else if (tabSwitchCount >= 2) {
+
+                        showToast(
+                            "Exam terminated due to tab switching.",
+                            true,
+                            5000
+                        );
+
+                        submitExam();
+                    }
+                }
+            }
+        });
+
+        function startQuiz() {
+
+            const nameInput =
+                document.getElementById('studentName').value.trim();
+
+            const rollInput =
+                document.getElementById('rollNo').value.trim();
+
+            const nameRegex = /^[a-zA-Z\s.]+$/;
+            const rollRegex = /^[0-9]+$/;
+
+            if (!nameInput || !nameRegex.test(nameInput)) {
+
+                showToast(
+                    "Please enter a valid name (English only).",
+                    true
+                );
+
+                return;
+            }
+
+            if (!rollInput || !rollRegex.test(rollInput)) {
+
+                showToast(
+                    "Please enter a valid roll number.",
+                    true
+                );
+
+                return;
+            }
+
+            // Transition UI
+            document
+                .getElementById('reg-section')
+                .classList.add('hidden');
+
+            document
+                .getElementById('reg-section')
+                .classList.remove('fade-in');
+
+            const quizSection =
+                document.getElementById('quiz-section');
+
+            quizSection.classList.remove('hidden');
+            quizSection.classList.add('fade-in');
+
+            // Prepare Data
+            quizData =
+                JSON.parse(
+                    JSON.stringify(QUIZ_CONFIG.rawQuestions)
+                );
+
+            renderQuestions();
+
+            // Start Timer
+            updateTimer();
+
+            timerInterval =
+                setInterval(updateTimer, 1000);
+
+            window.scrollTo(0, 0);
+        }
+
+        function renderQuestions() {
+
+            const container =
+                document.getElementById('questions-container');
+
+            container.innerHTML = '';
+
+            // Shuffle Questions
+            quizData.sort(() => Math.random() - 0.5);
+
+            quizData.forEach((item, index) => {
+
+                const correctAnswerString =
+                    item.options[item.ans];
+
+                // Shuffle Options
+                let shuffledOptions =
+                    [...item.options].sort(
+                        () => Math.random() - 0.5
+                    );
+
+                item.shuffledOptions =
+                    shuffledOptions;
+
+                item.newAnsIndex =
+                    shuffledOptions.indexOf(
+                        correctAnswerString
+                    );
+
+                // Format newlines
+                let questionText = item.q;
+
+                if (questionText.includes('\n')) {
+                    questionText =
+                        questionText.replace(
+                            /\n/g,
+                            '<br>'
+                        );
+                }
+
+                let html = `
+                <div class="question-card">
+
+                    <div class="question-text">
+
+                        <span style="color: var(--accent-color); margin-right: 15px;">
+                            ${(index + 1).toString().padStart(2, '0')}
+                        </span>
+
+                        ${questionText}
+
+                    </div>
+
+                    <div class="options-grid">
+                `;
+
+                shuffledOptions.forEach((opt, i) => {
+
+                    const inputId =
+                        `q${index}_opt${i}`;
+
+                    html += `
+                        <div class="option-wrapper">
+
+                            <input
+                                type="radio"
+                                name="q${index}"
+                                id="${inputId}"
+                                value="${i}"
+                            >
+
+                            <label
+                                class="option-label"
+                                for="${inputId}"
+                            >
+                                ${opt}
+                            </label>
+
+                        </div>
+                    `;
+                });
+
+                html += `
+                    </div>
+                </div>
+                `;
+
+                container.innerHTML += html;
+            });
+        }
+
+        function updateTimer() {
+
+            let m =
+                Math.floor(timeLimit / 60);
+
+            let s =
+                timeLimit % 60;
+
+            const timerEl =
+                document.getElementById('timer');
+
+            timerEl.innerText =
+                `${m < 10 ? '0' + m : m}:${s < 10 ? '0' + s : s}`;
+
+            // Warning color at 5 minutes
+            if (timeLimit <= 300) {
+                timerEl.classList.add('danger');
+            }
+
+            if (timeLimit <= 0) {
+
+                clearInterval(timerInterval);
+
+                submitExam();
+
+                return;
+            }
+
+            timeLimit--;
+        }
+
+        function submitExam() {
+
+            if (isSubmitted) return;
+
+            isSubmitted = true;
+
+            clearInterval(timerInterval);
+
+            const btn =
+                document.getElementById('submitBtn');
+
+            btn.innerText =
+                'Processing Transmission...';
+
+            btn.disabled = true;
+
+            let score = 0;
+
+            let reviewHTML = `
+                <h3 style="margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
+                    Answer Breakdown
+                </h3>
+            `;
+
+            quizData.forEach((item, index) => {
+
+                const selected =
+                    document.querySelector(
+                        `input[name="q${index}"]:checked`
+                    );
+
+                const userSelectedIndex =
+                    selected
+                        ? parseInt(selected.value)
+                        : -1;
+
+                const correctIndex =
+                    item.newAnsIndex;
+
+                let isCorrect =
+                    userSelectedIndex === correctIndex;
+
+                if (isCorrect) {
+                    score++;
+                }
+
+                let userText =
+                    userSelectedIndex !== -1
+                        ? item.shuffledOptions[userSelectedIndex]
+                        : 'No Answer Provided';
+
+                let correctText =
+                    item.shuffledOptions[correctIndex];
+
+                let boxClass =
+                    isCorrect
+                        ? 'correct-box'
+                        : 'wrong-box';
+
+                if (userSelectedIndex === -1) {
+                    boxClass = 'unanswered-box';
+                }
+
+                let questionText = item.q;
+
+                if (questionText.includes('\n')) {
+                    questionText =
+                        questionText.replace(
+                            /\n/g,
+                            '<br>'
+                        );
+                }
+
+                reviewHTML += `
+                <div class="review-card ${boxClass}">
+
+                    <p class="review-q">
+
+                        <span style="color: var(--text-muted); margin-right: 10px;">
+                            ${(index + 1).toString().padStart(2, '0')}
+                        </span>
+
+                        ${questionText}
+
+                    </p>
+
+                    <p class="review-ans">
+                        Selected:
+                        <span class="${
+                            isCorrect
+                                ? 'text-accent'
+                                : (
+                                    userSelectedIndex === -1
+                                        ? ''
+                                        : 'text-danger'
+                                )
+                        }">
+                            ${userText}
+                        </span>
+                    </p>
+
+                    ${
+                        !isCorrect
+                            ? `
+                                <p class="review-ans">
+                                    Correct:
+                                    <span class="text-accent">
+                                        ${correctText}
+                                    </span>
+                                </p>
+                            `
+                            : ''
+                    }
+
+                </div>
+                `;
+            });
+
+            document.getElementById(
+                'review-container'
+            ).innerHTML = reviewHTML;
+
+            const name =
+                document.getElementById(
+                    'studentName'
+                ).value.trim();
+
+            const roll =
+                document.getElementById(
+                    'rollNo'
+                ).value.trim();
+
+            const finalURL =
+                `${scriptURL}?name=${encodeURIComponent(name)}` +
+                `&roll=${encodeURIComponent(roll)}` +
+                `&score=${score}` +
+                `&subject=${encodeURIComponent(QUIZ_CONFIG.subjectName)}` +
+                `&subjectCode=${encodeURIComponent(QUIZ_CONFIG.subjectCode)}` +
+                `&quizNumber=${encodeURIComponent(QUIZ_CONFIG.quizNumber)}` +
+                `&date=${encodeURIComponent(QUIZ_CONFIG.examDate)}`;
+
+            fetch(
+                finalURL,
+                {
+                    method: 'GET',
+                    mode: 'no-cors'
+                }
+            )
+            .then(() => {
+
+                document
+                    .getElementById('quiz-section')
+                    .classList.add('hidden');
+
+                const resultSection =
+                    document.getElementById(
+                        'result-section'
+                    );
+
+                resultSection.classList.remove('hidden');
+                resultSection.classList.add('fade-in');
+
+                document.getElementById(
+                    'final-score'
+                ).innerText =
+                    `${score}/${quizData.length}`;
+
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+
+                showToast(
+                    "Transmission Successful"
+                );
+            })
+            .catch(error => {
+
+                showToast(
+                    "Transmission Failed. Check connection.",
+                    true,
+                    5000
+                );
+
+                btn.disabled = false;
+                btn.innerText =
+                    'Retry Transmission';
+
+                isSubmitted = false;
+            });
+        }
+
+    </script>
+
+</body>
+</html>
