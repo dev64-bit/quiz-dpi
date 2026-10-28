@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Quiz Examination | Elite Edition</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* CSS Reset & Variables */
+        :root {
+            --bg-color: #050505;
+            --surface-color: #111111;
+            --text-main: #f5f5f5;
+            --text-muted: #888888;
+            --accent-color: #ccff00; /* Neon Lime */
+            --border-color: #222222;
+            --danger-color: #ff3366;
+            
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            
+            /* Anti-Copy */
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        /* Utility Classes */
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Layout */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 24px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Header / Brand */
+        .brand {
+            position: fixed;
+            top: 40px;
+            left: 40px;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1.2rem;
+            letter-spacing: -0.5px;
+            z-index: 100;
+            text-transform: uppercase;
+        }
+        .brand span { color: var(--accent-color); }
+
+        /* Typography */
+        h1, h2, h3 { font-family: var(--font-display); font-weight: 700; }
+        
+        .hero-title {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -2px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 4rem;
+            font-weight: 300;
+        }
+
+        /* Forms & Inputs */
+        .form-group {
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .form-group input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid var(--border-color);
+            color: var(--text-main);
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            font-family: var(--font-display);
+            padding: 10px 0;
+            transition: all 0.4s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-bottom-color: var(--accent-color);
+        }
+
+        .form-group input::placeholder {
+            color: #333;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        /* Buttons */
+        .btn {
+            background: var(--text-main);
+            color: var(--bg-color);
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            font-weight: 600;
+            padding: 1.2rem 3rem;
+            border: none;
+            border-radius: 0;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-accent {
+            background: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        .btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(204, 255, 0, 0.2);
+        }
+
+        .btn:disabled {
+            background: #333;
+            color: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Quiz UI */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            background: var(--bg-color);
+            z-index: 10;
+            padding-top: 2rem;
+        }
+
+        .timer-wrapper {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .timer-wrapper.danger { color: var(--danger-color); animation: pulse 1s infinite; }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .question-card { margin-bottom: 4rem; }
+
+        .question-text {
+            font-family: var(--font-display);
+            font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+            margin-bottom: 2.5rem;
+            line-height: 1.4;
+        }
+
+        /* Custom Radio Buttons as Cards */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .option-wrapper { position: relative; }
+
+        .option-wrapper input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        .option-label {
+            display: block;
+            padding: 2rem;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            line-height: 1.5;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            color: var(--text-muted);
+        }
+
+        .option-label:hover {
+            border-color: rgba(204, 255, 0, 0.5);
+            color: var(--text-main);
+            transform: scale(1.02);
+        }
+
+        .option-wrapper input[type="radio"]:checked ~ .option-label {
+            border-color: var(--accent-color);
+            background: rgba(204, 255, 0, 0.03);
+            color: var(--accent-color);
+            box-shadow: inset 0 0 0 1px var(--accent-color);
+        }
+
+        /* Result Screen */
+        .result-container {
+            padding-top: 6rem;
+            text-align: left;
+        }
+        
+        .score-display {
+            font-size: clamp(4rem, 12vw, 8rem);
+            font-family: var(--font-display);
+            font-weight: 700;
+            line-height: 1;
+            margin: 1rem 0 3rem 0;
+            color: var(--accent-color);
+        }
+
+        /* Dark Theme Review Cards */
+        .review-card {
+            background: var(--surface-color);
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #333;
+            border-top: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            text-align: left;
+        }
+        
+        .correct-box { border-left-color: var(--accent-color); }
+        .wrong-box { border-left-color: var(--danger-color); }
+        .unanswered-box { border-left-color: var(--text-muted); }
+        
+        .review-q { font-size: 1.2rem; color: var(--text-main); margin-bottom: 15px; font-family: var(--font-display); }
+        .review-ans { font-size: 1rem; margin-bottom: 8px; color: var(--text-muted); }
+        .text-accent { color: var(--accent-color); font-weight: 600; }
+        .text-danger { color: var(--danger-color); font-weight: 600; }
+
+        /* Custom Alert / Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--text-main);
+            color: var(--bg-color);
+            padding: 15px 30px;
+            font-family: var(--font-display);
+            font-weight: 600;
+            border-radius: 4px;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        .toast.error {
+            background: var(--danger-color);
+            color: #fff;
+            box-shadow: 0 10px 30px rgba(255, 51, 102, 0.3);
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .brand { position: relative; top: 0; left: 0; margin-bottom: 2rem; display: block; padding: 20px 24px 0; }
+            .container { padding-top: 1rem; justify-content: flex-start; }
+            .options-grid { grid-template-columns: 1fr; }
+            .top-bar { padding-top: 1rem; flex-direction: column; align-items: flex-start; gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="brand">C-Prog<span>.</span></div>
+
+    <!-- Custom Message Box (Replaces alert) -->
+    <div id="toast" class="toast">Error Message Here</div>
+
+    <!-- Registration Section -->
+    <div id="reg-section" class="container fade-in">
+        <h1 class="hero-title">Ready for the<br>Challenge.</h1>
+        <p class="subtitle">Computer Office Application (Code: 28511)</p>
+        
+        <div class="form-group">
+            <span class="input-label">Student Name (English Only)</span>
+            <input type="text" id="studentName" placeholder="John Doe" autocomplete="off">
+        </div>
+
+        <div class="form-group">
+            <span class="input-label">Roll Number (English Digits)</span>
+            <input type="number" id="rollNo" placeholder="102938" autocomplete="off">
+        </div>
+
+        <div style="margin-top: 2rem;">
+            <button class="btn btn-accent" onclick="startQuiz()">Initialize Exam ➔</button>
+        </div>
+    </div>
+
+    <!-- Quiz Section -->
+    <div id="quiz-section" class="container hidden">
+        <div class="top-bar">
+            <div>
+                <div class="input-label" id="exam-meta">Computer Office Application / Quiz 03</div>
+            </div>
+            <div class="timer-wrapper" id="timer">
+                20:00
+            </div>
+        </div>
+
+        <div id="questions-container">
+            <!-- Questions will be injected here via JS -->
+        </div>
+
+        <div style="margin-top: 2rem; text-align: right; padding-bottom: 4rem;">
+            <button class="btn btn-accent" id="submitBtn" onclick="submitExam()">Submit Assessment</button>
+        </div>
+    </div>
+
+    <!-- Result Section -->
+    <div id="result-section" class="container hidden result-container">
+        <h2 class="subtitle" style="margin-bottom: 0;">Assessment Complete</h2>
+        <div class="score-display" id="final-score">0/40</div>
+        <p class="subtitle" style="color: var(--text-main); font-size: 1.2rem; max-width: 600px; margin-bottom: 3rem;">
+            আপনার রেজাল্ট সফলভাবে ট্রান্সমিট হয়েছে। নিচের প্যানেল থেকে আপনার উত্তরগুলো যাচাই করুন।
+        </p>
+        
+        <div id="review-container"></div>
+    </div>
+
+    <script>
+        // --- CONFIGURATION ---
+        const QUIZ_CONFIG = {
+            subjectName: "Computer Office Application",
+            subjectCode: "28511",
+            quizNumber: "Quiz 03",
+            examDate: "2026-10-28", 
+            timeLimitInMinutes: 20,
+            totalMarks: 40,
+
+            rawQuestions: [
+                {
+                                "q": "কম্পিউটারে ব্যবহৃত কয়েকটি হার্ডওয়্যারের নাম কী?",
+                                "options": [
+                                                "Windows, Linux, Android",
+                                                "সিস্টেম ইউনিট, মাদারবোর্ড, হার্ড ডিস্ক",
+                                                "Word, Excel, PowerPoint",
+                                                "Google, Chrome, Gmail"
+                                ],
+                                "ans": 1
+                },
+                {
+                                "q": "কম্পিউটার সিস্টেম ইউনিট বলতে কী বুঝায়?",
+                                "options": [
+                                                "শুধু কীবোর্ড ও মাউস",
+                                                "শুধু হার্ড ডিস্ক",
+                                                "কম্পিউটারের মনিটর",
+                                                "কেসিং-এর ভিতর মাদারবোর্ড, প্রসেসর ইত্যাদির সমন্বয়"
+                                ],
+                                "ans": 3
+                },
+                {
+                                "q": "মাদারবোর্ড কী?",
+                                "options": [
+                                                "প্রিন্টেড সার্কিট বোর্ড",
+                                                "একটি ইনপুট ডিভাইস",
+                                                "একটি অপারেটিং সিস্টেম",
+                                                "একটি সফটওয়্যার"
+                                ],
+                                "ans": 0
+                },
+                {
+                                "q": "প্রসেসর বা মাইক্রোপ্রসেসর কী?",
+                                "options": [
+                                                "Random Access Memory",
+                                                "সিপিইউ বা Central Processing Unit",
+                                                "Hard Disk Drive",
+                                                "Power Supply Unit"
+                                ],
+                                "ans": 1
+                },
+                {
+                                "q": "পাওয়ার সাপ্লাই এর কাজ কী?",
+                                "options": [
+                                                "কম্পিউটারের বিভিন্ন ডিভাইসে বিদ্যুৎ সরবরাহ করা",
+                                                "ডকুমেন্ট প্রিন্ট করা",
+                                                "ডাটা সংরক্ষণ করা",
+                                                "ইন্টারনেট সংযোগ দেওয়া"
+                                ],
+                                "ans": 0
+                },
+                {
+                                "q": "হার্ড ডিস্ক বা হার্ড ড্রাইভ কী?",
+                                "options": [
+                                                "তথ্য প্রদর্শনের যন্ত্র",
+                                                "ইন্টারনেট সংযোগের যন্ত্র",
+                                                "তথ্য সংরক্ষণের যন্ত্র",
+                                                "বিদ্যুৎ সরবরাহের যন্ত্র"
+                                ],
+                                "ans": 2
+                },
+                {
+                                "q": "RAM-এর পূর্ণরূপ কী?",
+                                "options": [
+                                                "Read Access Memory",
+                                                "Random Allocation Memory",
+                                                "Rapid Access Module",
+                                                "Random Access Memory"
+                                ],
+                                "ans": 3
+                },
+                {
+                                "q": "SSD-এর সংক্ষিপ্ত রূপ কীসের?",
+                                "options": [
+                                                "Secure State Drive",
+                                                "System Storage Device",
+                                                "Solid-State Drive",
+                                                "Solid Storage Disk"
+                                ],
+                                "ans": 2
+                },
+                {
+                                "q": "ROM-এর পূর্ণরূপ কী?",
+                                "options": [
+                                                "Rapid Output Memory",
+                                                "Read Only Memory",
+                                                "Read Open Memory",
+                                                "Random Only Memory"
+                                ],
+                                "ans": 1
+                },
+                {
+                                "q": "বাংলা লেখার একটি ফন্টের নাম কোনটি?",
+                                "options": [
+                                                "Calibri",
+                                                "Times New Roman",
+                                                "Arial",
+                                                "Sutonny MJ"
+                                ],
+                                "ans": 3
+                },
+                {
+                                "q": "ইংরেজি লেখার একটি ফন্টের নাম কোনটি?",
+                                "options": [
+                                                "Times New Roman",
+                                                "Nikosh",
+                                                "Sutonny MJ",
+                                                "SolaimanLipi"
+                                ],
+                                "ans": 0
+                },
+                {
+                                "q": "বিজয় কী-বোর্ডে বাংলা লেখার শর্টকাট কমান্ড কী?",
+                                "options": [
+                                                "Ctrl + Alt + V",
+                                                "Alt + B",
+                                                "Ctrl + Alt + B",
+                                                "Ctrl + Shift + B"
+                                ],
+                                "ans": 2
+                },
+                {
+                                "q": "ইউনিকোডে বাংলা লেখার শর্টকাট কমান্ড কী?",
+                                "options": [
+                                                "Ctrl + Shift + V",
+                                                "Alt + V",
+                                                "Ctrl + Alt + B",
+                                                "Ctrl + Alt + V"
+                                ],
+                                "ans": 3
+                },
+                {
+                                "q": "অভ্র-ফনেটিক কী?",
+                                "options": [
+                                                "একটি প্রিন্টিং পদ্ধতি",
+                                                "বাংলা উচ্চারণে ইংরেজি অক্ষরে টাইপের পদ্ধতি",
+                                                "বাংলা লেখার একটি ফন্ট",
+                                                "ইংরেজি টাইপের কীবোর্ড"
+                                ],
+                                "ans": 1
+                },
+                {
+                                "q": "উইন্ডোজ-এর স্ক্রিনে (ডেস্কটপে) সাধারণত কোন আইকন থাকে?",
+                                "options": [
+                                                "My Computer, Recycle Bin, My Documents",
+                                                "Google Chrome, Gmail, YouTube",
+                                                "Word, Excel, PowerPoint",
+                                                "Control Panel, BIOS, CPU"
+                                ],
+                                "ans": 0
+                },
+                {
+                                "q": "ইন্টারনেট কী?",
+                                "options": [
+                                                "একটি প্রিন্টার",
+                                                "আন্তঃসংযোগ ব্যবস্থা বা নেটওয়ার্ক",
+                                                "একটি অ্যান্টিভাইরাস",
+                                                "একটি অপারেটিং সিস্টেম"
+                                ],
+                                "ans": 1
+                },
+                {
+                                "q": "ই-মেইল এর পূর্ণরূপ কী?",
+                                "options": [
+                                                "Electronic Machine Language",
+                                                "Electronic Mail",
+                                                "Electronic Message Link",
+                                                "Easy Mail"
+                                ],
+                                "ans": 1
+                },
+                {
+                                "q": "জনপ্রিয় ব্রাউজিং সফটওয়্যার কোনটি?",
+                                "options": [
+                                                "Google Drive",
+                                                "Google Chrome",
+                                                "Google Search",
+                                                "Gmail"
+                                ],
+                                "ans": 1
+                },
+                {
+                                "q": "জনপ্রিয় ওয়েব সার্চ ইঞ্জিন কোনটি?",
+                                "options": [
+                                                "Windows",
+                                                "Google Chrome",
+                                                "Dropbox",
+                                                "Google"
+                                ],
+                                "ans": 3
+                },
+                {
+                                "q": "গুগল মিট কী?",
+                                "options": [
+                                                "ওয়েব ব্রাউজার",
+                                                "ভিডিও কনফারেন্সিং টুল",
+                                                "ক্লাউড স্টোরেজ",
+                                                "সার্চ ইঞ্জিন"
+                                ],
+                                "ans": 1
+                },
+                {
+                                "q": "ড্রপবক্স কী?",
+                                "options": [
+                                                "অনলাইন ক্লাউড ডাটা স্টোরেজ",
+                                                "ভিডিও কনফারেন্সিং টুল",
+                                                "ওয়েব সার্চ ইঞ্জিন",
+                                                "অপারেটিং সিস্টেম"
+                                ],
+                                "ans": 0
+                },
+                {
+                                "q": "গুগল ড্রাইভে প্রতিটি অ্যাকাউন্টের জন্য কত জিবি ক্লাউড স্টোরেজ ফ্রি থাকে?",
+                                "options": [
+                                                "25 GB",
+                                                "5 GB",
+                                                "15 GB",
+                                                "10 GB"
+                                ],
+                                "ans": 2
+                },
+                {
+                                "q": "URL এর পূর্ণরূপ কী?",
+                                "options": [
+                                                "Universal Resource Link",
+                                                "United Resource Locator",
+                                                "Uniform Resource Locator",
+                                                "Uniform Reference Link"
+                                ],
+                                "ans": 2
+                },
+                {
+                                "q": "HTML এর পূর্ণরূপ কী?",
+                                "options": [
+                                                "High Text Machine Language",
+                                                "Home Tool Markup Language",
+                                                "Hyper Text Markup Language",
+                                                "Hyper Transfer Markup Link"
+                                ],
+                                "ans": 2
+                },
+                {
+                                "q": "http এর পূর্ণরূপ কী?",
+                                "options": [
+                                                "Hyperlink Transfer Protocol",
+                                                "Hyper Text Transmission Program",
+                                                "Hypertext Transfer Protocol",
+                                                "High Transfer Text Protocol"
+                                ],
+                                "ans": 2
+                },
+                {
+                                "q": "রাউটার কী?",
+                                "options": [
+                                                "একটি ইনপুট ডিভাইস",
+                                                "একটি নেটওয়ার্ক ডিভাইস",
+                                                "একটি অপারেটিং সিস্টেম",
+                                                "একটি স্টোরেজ ডিভাইস"
+                                ],
+                                "ans": 1
+                },
+                {
+                                "q": "ই-কমার্স কী?",
+                                "options": [
+                                                "ইন্টারনেট ব্যবহার করে ব্যবসা-বাণিজ্য",
+                                                "ই-মেইল পাঠানোর পদ্ধতি",
+                                                "ইন্টারনেট ব্যবহার করে গান শোনা",
+                                                "কম্পিউটার মেরামতের পদ্ধতি"
+                                ],
+                                "ans": 0
+                },
+                {
+                                "q": "CC এবং BCC এর পূর্ণরূপ কী?",
+                                "options": [
+                                                "Carbon Code এবং Basic Carbon Copy",
+                                                "Carbon Copy এবং Blind Carbon Copy",
+                                                "Central Copy এবং Blind Computer Copy",
+                                                "Computer Copy এবং Backup Carbon Copy"
+                                ],
+                                "ans": 1
+                },
+                {
+                                "q": "ম্যালওয়্যার কী?",
+                                "options": [
+                                                "একটি ব্রাউজার",
+                                                "ক্ষতিকর প্রোগ্রাম",
+                                                "একটি সার্চ ইঞ্জিন",
+                                                "একটি ক্লাউড স্টোরেজ"
+                                ],
+                                "ans": 1
+                },
+                {
+                                "q": "MEGA কী?",
+                                "options": [
+                                                "একটি অপারেটিং সিস্টেম",
+                                                "একটি সার্চ ইঞ্জিন",
+                                                "একটি ক্লাউড স্টোরেজ ওয়েবসাইট",
+                                                "একটি অ্যান্টিভাইরাস"
+                                ],
+                                "ans": 2
+                },
+                {
+                                "q": "অপারেটিং সিস্টেম কী?",
+                                "options": [
+                                                "শুধু ইন্টারনেট চালানোর সফটওয়্যার",
+                                                "একটি ইনপুট ডিভাইস",
+                                                "সফটওয়্যার ও হার্ডওয়্যারের মধ্যে যোগাযোগ স্থাপনকারী সিস্টেম",
+                                                "শুধু ফাইল সংরক্ষণের সফটওয়্যার"
+                                ],
+                                "ans": 2
+                },
+                {
+                                "q": "ডিরেক্টরি কী?",
+                                "options": [
+                                                "একটি প্রিন্টার ড্রাইভার",
+                                                "ডিস্কের অন্তর্গত একটি ফোল্ডার যেখানে ফাইল জমা রাখা হয়",
+                                                "একটি ইন্টারনেট ব্রাউজার",
+                                                "একটি কম্পিউটার ভাইরাস"
+                                ],
+                                "ans": 1
+                },
+                {
+                                "q": "GUI বা গ্রাফিক্যাল অপারেটিং সিস্টেম কী?",
+                                "options": [
+                                                "Graphical User Interface বা চিত্রের মাধ্যমে কমান্ড প্রদান",
+                                                "Graphical Utility Input বা ডাটা ইনপুট পদ্ধতি",
+                                                "General User Internet বা ইন্টারনেট ব্যবহারের পদ্ধতি",
+                                                "General User Interface বা কীবোর্ডের মাধ্যমে কমান্ড প্রদান"
+                                ],
+                                "ans": 0
+                },
+                {
+                                "q": "প্রিন্টার কী?",
+                                "options": [
+                                                "বিদ্যুৎ সরবরাহের ডিভাইস",
+                                                "ছাপানোর কাজ বা মুদ্রণ করার আউটপুট ডিভাইস",
+                                                "ইন্টারনেট সংযোগের ডিভাইস",
+                                                "তথ্য সংরক্ষণের ইনপুট ডিভাইস"
+                                ],
+                                "ans": 1
+                },
+                {
+                                "q": "লাইন প্রিন্টার প্রতি মিনিটে কয়টি লাইন প্রিন্ট করতে পারে?",
+                                "options": [
+                                                "১ থেকে ১০টি",
+                                                "১০ থেকে ১০০০টি",
+                                                "১০০০ থেকে ৫০০০টি",
+                                                "৫ থেকে ৫০টি"
+                                ],
+                                "ans": 1
+                },
+                {
+                                "q": "প্রিন্টার প্রধানত কয়টি অংশ নিয়ে গঠিত?",
+                                "options": [
+                                                "৪টি (কীবোর্ড, মাউস, মনিটর ও CPU)",
+                                                "২টি (ইলেকট্রনিক্স সার্কিট ও মেকানিক্যাল অংশ)",
+                                                "৩টি (সফটওয়্যার, হার্ডওয়্যার ও নেটওয়ার্ক)",
+                                                "৫টি (RAM, ROM, CPU, HDD ও PSU)"
+                                ],
+                                "ans": 1
+                },
+                {
+                                "q": "ট্রোজান কী?",
+                                "options": [
+                                                "একটি অপারেটিং সিস্টেম",
+                                                "ক্ষতিকর ম্যালওয়্যার যা কম্পিউটারের ক্ষতি করে",
+                                                "একটি ক্লাউড স্টোরেজ",
+                                                "একটি নিরাপদ ব্রাউজার"
+                                ],
+                                "ans": 1
+                },
+                {
+                                "q": "ফিশিং কী?",
+                                "options": [
+                                                "ইন্টারনেটে ভিডিও দেখা",
+                                                "ই-মেইল বা ওয়েবসাইটের মাধ্যমে প্রতারণামূলকভাবে তথ্য চুরি করা",
+                                                "কম্পিউটারে ফাইল ব্যাকআপ করা",
+                                                "একটি ডকুমেন্ট প্রিন্ট করা"
+                                ],
+                                "ans": 1
+                },
+                {
+                                "q": "সাইবার অপরাধ বা সাইবার ক্রাইম কী?",
+                                "options": [
+                                                "ডাটা সংরক্ষণের পদ্ধতি",
+                                                "ইন্টারনেটের মাধ্যমে সংঘটিত অপরাধ",
+                                                "কম্পিউটার চালু করার প্রক্রিয়া",
+                                                "ইন্টারনেট সংযোগ স্থাপনের পদ্ধতি"
+                                ],
+                                "ans": 1
+                },
+                {
+                                "q": "কম্পিউটার স্লো কাজ করার কারণ কী?",
+                                "options": [
+                                                "র‍্যাম কম হওয়া/ভাইরাস আক্রমণ/অতিরিক্ত প্রোগ্রাম",
+                                                "শুধু মনিটরের আকার ছোট হওয়া",
+                                                "শুধু প্রিন্টার সংযুক্ত থাকা",
+                                                "শুধু কীবোর্ড পরিবর্তন করা"
+                                ],
+                                "ans": 0
+                }
+]
+        };
+
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzIESFNCVK3aCS3-u0OdzmPa20OcDqpdKjVJqPsA7BzkWSsyTxh1-2ogxka5cDiHEue0Q/exec';
+
+        // --- CORE LOGIC ---
+        let timeLimit = QUIZ_CONFIG.timeLimitInMinutes * 60;
+        let timerInterval;
+        let quizData = [];
+        let isSubmitted = false;
+        let tabSwitchCount = 0;
+
+        // Anti-Copy Restrictions
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && ['c', 'a', 'u', 'p', 'C', 'A', 'U', 'P'].includes(e.key)) e.preventDefault();
+            if (e.key === 'F12') e.preventDefault();
+        });
+
+        function showToast(message, isError = false, duration = 3000) {
+            const toast = document.getElementById('toast');
+            toast.innerText = message;
+            if(isError) {
+                toast.classList.add('error');
+            } else {
+                toast.classList.remove('error');
+            }
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, duration);
+        }
+
+        // Tab Switching Anti-Cheat
+        document.addEventListener("visibilitychange", function() {
+            const quizSection = document.getElementById('quiz-section');
+            if (quizSection && !quizSection.classList.contains('hidden') && !isSubmitted) {
+                if (document.hidden) {
+                    tabSwitchCount++;
+                    if (tabSwitchCount === 1) {
+                        showToast("Warning: Switching tabs is not allowed. One more time and exam submits automatically.", true, 5000);
+                    } else if (tabSwitchCount >= 2) {
+                        showToast("Exam terminated due to tab switching.", true, 5000);
+                        submitExam();
+                    }
+                }
+            }
+        });
+
+        function startQuiz() {
+            const nameInput = document.getElementById('studentName').value.trim();
+            const rollInput = document.getElementById('rollNo').value.trim();
+            const nameRegex = /^[a-zA-Z\s.]+$/;
+            const rollRegex = /^[0-9]+$/;
+
+            if (!nameInput || !nameRegex.test(nameInput)) {
+                showToast("Please enter a valid name (English only).", true);
+                return;
+            }
+            if (!rollInput || !rollRegex.test(rollInput)) {
+                showToast("Please enter a valid roll number.", true);
+                return;
+            }
+
+            // Transition UI
+            document.getElementById('reg-section').classList.add('hidden');
+            document.getElementById('reg-section').classList.remove('fade-in');
+            
+            const quizSection = document.getElementById('quiz-section');
+            quizSection.classList.remove('hidden');
+            quizSection.classList.add('fade-in');
+            
+            // Prepare Data
+            quizData = JSON.parse(JSON.stringify(QUIZ_CONFIG.rawQuestions));
+            renderQuestions();
+            
+            // Start Timer
+            updateTimer();
+            timerInterval = setInterval(updateTimer, 1000);
+            window.scrollTo(0,0);
+        }
+
+        function renderQuestions() {
+            const container = document.getElementById('questions-container');
+            container.innerHTML = '';
+            
+            // Shuffle Questions
+            quizData.sort(() => Math.random() - 0.5);
+
+            quizData.forEach((item, index) => {
+                const correctAnswerString = item.options[item.ans];
+                
+                // Shuffle Options
+                let shuffledOptions = [...item.options].sort(() => Math.random() - 0.5);
+                item.shuffledOptions = shuffledOptions;
+                item.newAnsIndex = shuffledOptions.indexOf(correctAnswerString);
+
+                // Format newlines for code blocks
+                let questionText = item.q;
+                if(questionText.includes('\n')) {
+                    questionText = questionText.replace(/\n/g, '<br>');
+                }
+
+                let html = `
+                <div class="question-card">
+                    <div class="question-text">
+                        <span style="color: var(--accent-color); margin-right: 15px;">${(index + 1).toString().padStart(2, '0')}</span> 
+                        ${questionText}
+                    </div>
+                    <div class="options-grid">
+                `;
+                
+                shuffledOptions.forEach((opt, i) => {
+                    const inputId = `q${index}_opt${i}`;
+                    html += `
+                        <div class="option-wrapper">
+                            <input type="radio" name="q${index}" id="${inputId}" value="${i}">
+                            <label class="option-label" for="${inputId}">${opt}</label>
+                        </div>
+                    `;
+                });
+                
+                html += `</div></div>`;
+                container.innerHTML += html;
+            });
+        }
+
+        function updateTimer() {
+            let m = Math.floor(timeLimit / 60);
+            let s = timeLimit % 60;
+            
+            const timerEl = document.getElementById('timer');
+            timerEl.innerText = `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+            
+            // Warning color at 5 minutes
+            if (timeLimit <= 300) {
+                timerEl.classList.add('danger');
+            }
+            
+            if (timeLimit <= 0) {
+                clearInterval(timerInterval);
+                submitExam();
+            }
+            timeLimit--;
+        }
+
+        function submitExam() {
+            if (isSubmitted) return;
+            isSubmitted = true;
+            clearInterval(timerInterval);
+
+            const btn = document.getElementById('submitBtn');
+            btn.innerText = 'Processing Transmission...';
+            btn.disabled = true;
+
+            let score = 0;
+            let reviewHTML = '<h3 style="margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">Answer Breakdown</h3>';
+
+            quizData.forEach((item, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                const userSelectedIndex = selected ? parseInt(selected.value) : -1;
+                const correctIndex = item.newAnsIndex;
+                
+                let isCorrect = userSelectedIndex === correctIndex;
+                if (isCorrect) score++;
+
+                let userText = userSelectedIndex !== -1 ? item.shuffledOptions[userSelectedIndex] : 'No Answer Provided';
+                let correctText = item.shuffledOptions[correctIndex];
+                
+                let boxClass = isCorrect ? 'correct-box' : 'wrong-box';
+                if (userSelectedIndex === -1) boxClass = 'unanswered-box';
+
+                let questionText = item.q;
+                if(questionText.includes('\n')) {
+                    questionText = questionText.replace(/\n/g, '<br>');
+                }
+
+                reviewHTML += `
+                <div class="review-card ${boxClass}">
+                    <p class="review-q"><span style="color: var(--text-muted); margin-right: 10px;">${(index + 1).toString().padStart(2, '0')}</span> ${questionText}</p>
+                    <p class="review-ans">Selected: <span class="${isCorrect ? 'text-accent' : (userSelectedIndex === -1 ? '' : 'text-danger')}">${userText}</span></p>
+                    ${!isCorrect ? `<p class="review-ans">Correct: <span class="text-accent">${correctText}</span></p>` : ''}
+                </div>`;
+            });
+
+            document.getElementById('review-container').innerHTML = reviewHTML;
+
+            const name = document.getElementById('studentName').value.trim();
+            const roll = document.getElementById('rollNo').value.trim();
+
+            const finalURL = `${scriptURL}?name=${encodeURIComponent(name)}&roll=${encodeURIComponent(roll)}&score=${score}&subject=${encodeURIComponent(QUIZ_CONFIG.subjectName)}&subjectCode=${encodeURIComponent(QUIZ_CONFIG.subjectCode)}&quizNumber=${encodeURIComponent(QUIZ_CONFIG.quizNumber)}&date=${encodeURIComponent(QUIZ_CONFIG.examDate)}`;
+            
+            fetch(finalURL, { method: 'GET', mode: 'no-cors' })
+            .then(() => {
+                document.getElementById('quiz-section').classList.add('hidden');
+                
+                const resultSection = document.getElementById('result-section');
+                resultSection.classList.remove('hidden');
+                resultSection.classList.add('fade-in');
+                
+                document.getElementById('final-score').innerText = `${score}/${quizData.length}`;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                showToast("Transmission Successful");
+            })
+            .catch(error => {
+                showToast("Transmission Failed. Check connection.", true, 5000);
+                btn.disabled = false;
+                btn.innerText = 'Retry Transmission';
+                isSubmitted = false;
+            });
+        }
+    </script>
+</body>
+</html>
